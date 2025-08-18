@@ -18,13 +18,14 @@ export class AuthService {
     try {
       const hashedPassword = await argon.hash(password);
 
-      await this.prisma.user.create({
+      const newUser = await this.prisma.user.create({
         data: {
           email,
           password: hashedPassword,
         },
       });
-      return { message: 'User created successfully' };
+
+      return this.getTokens(newUser.id, newUser.email);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {

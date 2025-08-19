@@ -68,6 +68,27 @@ export class AuthService {
     });
     return { message: 'Logged out successfully' };
   }
+  async refreshTokens(userId: string, refreshToken: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || !user.refreshToken) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    const isRefreshTokenValid = await argon.verify(
+      user.refreshToken,
+      refreshToken,
+    );
+    if (!isRefreshTokenValid) {
+      throw new ForbiddenException('Invalid refresh token');
+    }
+
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
+  }
 
   async getTokens(userId: string, email: string) {
     const accessToken = await this.jwtService.signAsync(

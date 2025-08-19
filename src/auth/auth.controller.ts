@@ -16,6 +16,7 @@ interface RequestWithUser extends Request {
   user: {
     sub: string;
     email: string;
+    refreshToken: string;
   };
 }
 @Controller('auth')
@@ -37,5 +38,13 @@ export class AuthController {
   async logout(@Req() req: RequestWithUser) {
     const userId = req.user.sub;
     return this.authService.logout(userId);
+  }
+  @UseGuards(AuthGuard('refresh-token'))
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Req() req: RequestWithUser) {
+    const userId = req.user.sub;
+    const refreshToken = req.user.refreshToken;
+    return this.authService.refreshTokens(userId, refreshToken);
   }
 }

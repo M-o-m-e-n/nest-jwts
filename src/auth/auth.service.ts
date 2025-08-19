@@ -66,6 +66,7 @@ export class AuthService {
         refreshToken: null,
       },
     });
+    return { message: 'Logged out successfully' };
   }
 
   async getTokens(userId: string, email: string) {

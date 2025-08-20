@@ -3,13 +3,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-
-export interface JwtPayload {
-  sub: string;
-  email: string;
-  iat?: number;
-  exp?: number;
-}
+import { JwtPayload, JwtPayloadWithRefreshToken } from '../types/auth.types';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -31,8 +25,16 @@ export class RefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  validate(req: Request, payload: JwtPayload) {
+  validate(req: Request, payload: JwtPayload): JwtPayloadWithRefreshToken {
     const refreshToken = req.get('authorization')?.replace('Bearer', '').trim();
-    return { ...payload, refreshToken };
+
+    if (!refreshToken) {
+      throw new Error('Refresh token not found');
+    }
+
+    return {
+      ...payload,
+      refreshToken,
+    };
   }
 }

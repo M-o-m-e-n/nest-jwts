@@ -2,13 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-export interface JwtPayload {
-  sub: string;
-  email: string;
-  iat?: number;
-  exp?: number;
-}
+import { JwtPayload } from '../types/auth.types';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
@@ -30,7 +24,12 @@ export class AccessTokenStrategy extends PassportStrategy(
     });
   }
 
-  validate(payload: JwtPayload) {
-    return { userId: payload.sub, email: payload.email };
+  validate(payload: JwtPayload): JwtPayload {
+    return {
+      sub: payload.sub,
+      email: payload.email,
+      iat: payload.iat,
+      exp: payload.exp,
+    };
   }
 }

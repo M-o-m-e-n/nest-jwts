@@ -37,12 +37,10 @@ export class AuthController {
   @UseGuards(AuthGuard('access-token'))
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(
-    @GetCurrentUserId() userId: string,
-  ): Promise<{ message: string }> {
+  async logout(@GetCurrentUserId() userId: string) {
     return this.authService.logout(userId);
   }
-
+  @Public()
   @UseGuards(AuthGuard('refresh-token'))
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
